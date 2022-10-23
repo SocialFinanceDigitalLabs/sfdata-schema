@@ -1,0 +1,27 @@
+id: sfdata-sample-single-file
+version: 1.0.0
+description: |
+  This is a sample file to demonstrate how to use the sfdata tool.
+
+  In this case we create a very simple schema in a single file.
+
+records:
+
+  person:
+      fields:
+          id:
+              primary_key: true
+          name: {}
+
+  address:
+      fields:
+          person_id:
+              primary_key: true
+              # Foreign key references are <record>.<field>
+              foreign_keys:
+                - person.id
+          type:
+              primary_key: true
+          street: {}
+          city: {}
+          postal_code: {}
