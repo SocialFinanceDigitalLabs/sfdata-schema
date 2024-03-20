@@ -1,16 +1,15 @@
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-import graphviz
 import pytest
 
-from sfdata_schema import Field, Record, Schema
+from sfdata_schema.spec import Field, Record, TabularSchema
 from sfdata_schema.erd import get_erd_context, render_erd
 
 
 @pytest.fixture
 def test_schema():
-    schema = Schema(
+    schema = TabularSchema(
         records=[
             Record(
                 "person",
@@ -69,6 +68,7 @@ def test_render_erd(test_schema):
 
 
 def create_image(source_image, format, target_path):
+    import graphviz
     output_path = graphviz.render("circo", format, source_image)
     output_path = Path(output_path)
     output_path.replace(target_path)

@@ -2,14 +2,13 @@ from collections import namedtuple
 from pathlib import Path
 from typing import Any, Mapping, Union
 
-from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from sfdata_schema import Schema
+from sfdata_schema.spec import TabularSchema
 
 Relationship = namedtuple("Relationship", "lh rh lh_c rh_c")
 
 
-def get_erd_context(schema: Schema) -> Mapping[str, Any]:
+def get_erd_context(schema: TabularSchema) -> Mapping[str, Any]:
     relationships = []
 
     for r in schema.records.values():
@@ -26,10 +25,15 @@ def get_erd_context(schema: Schema) -> Mapping[str, Any]:
 
 
 def render_erd(
-    schema: Schema,
+    schema: TabularSchema,
     template_name: str = "erd.dot",
     template_path: Union[str, Path] = None,
 ):
+    try:
+        from jinja2 import Environment, FileSystemLoader, select_autoescape
+    except ImportError:
+        raise ImportError("This function requires the jinja2 package")
+
     if template_path is None:
         template_path = Path(__file__).parent / "templates"
 

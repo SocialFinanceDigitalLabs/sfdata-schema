@@ -6,22 +6,41 @@ description: |
   In this case we create a very simple schema in a single file.
 
 records:
-
   person:
-      fields:
-          id:
-              primary_key: true
-          name: {}
+    description: |
+      A person record.
+    fields:
+      id:
+        primary_key: true
+      name: {}
 
   address:
-      fields:
-          person_id:
-              primary_key: true
-              # Foreign key references are <record>.<field>
-              foreign_keys:
-                - person.id
-          type:
-              primary_key: true
-          street: {}
-          city: {}
-          postal_code: {}
+    description: |
+      An address record.
+    fields:
+      person_id:
+        primary_key: true
+        foreign_keys:
+          - person.id
+      type:
+        primary_key: true
+      street: {}
+      city: {}
+      postal_code: {}
+
+datatypes:
+  custom:
+    extends: string
+    description: |
+      A custom datatype that extends the string datatype.
+      This is a multiline description.
+  categorical:
+    extends: string
+    restriction:
+      enumeration:
+        - one
+        - two
+        - three
+    description: |
+      A custom datatype that extends the string datatype.
+      This is a multiline description.
