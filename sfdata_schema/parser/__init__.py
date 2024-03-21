@@ -2,11 +2,11 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Protocol, Union, runtime_checkable
 from dataclasses import fields
 
-import jstyleson
+import json5
 import yaml
 
 from sfdata_schema import spec
-from sfdata_schema.spec.datatypes import DT_STRING, STANDARD_TYPES, Datatype, DatatypeRestriction
+from sfdata_schema.spec.datatypes import STANDARD_TYPES, Datatype, DatatypeRestriction
 
 
 @runtime_checkable
@@ -50,7 +50,7 @@ def _parse_file(path: Path) -> spec.TabularSchema:
 
 def _parse_string(content: str) -> spec.TabularSchema:
     if content.startswith("{"):
-        content = jstyleson.loads(content)
+        content = json5.loads(content)
     else:
         content = yaml.safe_load(content)
     return _parse_dict(content)
