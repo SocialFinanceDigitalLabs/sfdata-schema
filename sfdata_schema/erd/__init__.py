@@ -11,12 +11,12 @@ Relationship = namedtuple("Relationship", "lh rh lh_c rh_c")
 def get_erd_context(schema: TabularSchema) -> Mapping[str, Any]:
     relationships = []
 
-    for r in schema.records.values():
-        pk = r.primary_keys
+    for r in schema.records:
+        pk = [p.id for p in r.primary_keys]
         for f in r.fields:
             if f.foreign_keys:
                 for fk in f.foreign_keys:
-                    lh_c = "0,1" if pk == [f] else "0..N"
+                    lh_c = "0,1" if pk == [f.id] else "0..N"
                     relationships.append(
                         Relationship(lh=r.id, rh=fk.record.id, lh_c=lh_c, rh_c=1)
                     )

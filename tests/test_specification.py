@@ -1,20 +1,22 @@
 import pytest
 
-from sfdata_schema.spec import Field, Record, TabularSchema, Datatype
+from sfdata_schema.spec import Record, TabularSchema
+from sfdata_schema.spec.datatypes import DT_STRING
 
 
 @pytest.fixture
 def simple_schema():
-    dt1 = Datatype("str")
-    r1_f1 = Field("r1.f1", label="f1", datatype=str, primary_key=True)
-    r1_f2 = Field("r1.f2", label="f2", datatype=str)
-    r2_f1 = Field("r2.f1", label="f1", datatype=str, primary_key=True, foreign_keys=[r1_f1])
-    r2_f3 = Field("r2.f3", label="f3", datatype=str)
+    schema =  TabularSchema(id="s1")
+    r1 = schema.add_record("r1", label="r1")
+    r2 = schema.add_record("r2", label="r2")
 
-    r1 = Record("r1", "r1", [r1_f1, r1_f2])
-    r2 = Record("r2", "r2", [r2_f1, r2_f3])
+    r1.add_field("f1", primary_key=True)
+    r1.add_field("f2", primary_key=True)
 
-    return TabularSchema(id="s1", records=[r1, r2])
+    r2.add_field("f1", primary_key=True, foreign_keys="r1.f1")
+    r2.add_field("f3")
+
+    return schema
 
 
 def test_schema_structure(simple_schema):
@@ -28,8 +30,8 @@ def test_schema_structure(simple_schema):
 
     fields = r1.fields
     assert len(fields) == 2
-    assert fields[0].id == "r1.f1"
-    assert fields[1].id == "r1.f2"
+    assert fields[0].qname == "r1.f1"
+    assert fields[1].qname == "r1.f2"
 
 
 def test_spec_eq():
@@ -44,7 +46,7 @@ def test_spec_eq():
 
 def test_spec_repr():
     r1 = Record("r1", "r1", [])
-    assert repr(r1) == "sfdata_schema.spec._data.Record(id='r1', label='r1', fields=[], description=None, options={})"
+    assert repr(r1) == "Record(id='r1', options='{}')"
 
 def test_spec_hash():
     r1 = Record("r1", "r1", [])

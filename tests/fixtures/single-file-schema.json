@@ -11,7 +11,12 @@
         "id": {
           "primary_key": true
         },
-        "name": {}
+        "name": {
+          "datatype": "custom"
+        },
+        "count": {
+          "datatype": "categorical"
+        },
       }
     },
     "address": {
@@ -27,6 +32,17 @@
         "street": {},
         "city": {},
         "postal_code": {}
+      }
+    }
+  },
+  "datatypes": {
+    "custom": {
+      "extends": "string"
+    },
+    "categorical": {
+      "extends": "string",
+      "restriction": {
+        "enumeration": ["one", "two", "three"]
       }
     }
   }

@@ -12,7 +12,10 @@ records:
     fields:
       id:
         primary_key: true
-      name: {}
+      name:
+        datatype: custom
+      count:
+        datatype: categorical        
 
   address:
     description: |

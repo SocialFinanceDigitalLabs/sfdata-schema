@@ -1,6 +1,7 @@
 from pathlib import Path
 from sfdata_schema.spec import TabularSchema
 from sfdata_schema.parser import parse_schema, Readable
+from sfdata_schema.spec.datatypes import DT_STRING
 
 def test_readable():
     from io import StringIO
@@ -33,11 +34,12 @@ def assert_schema(file):
 
     assert len(schema.records) == 2
 
-    all_fields = {f"{r.id}.{f.id}": f for r in schema.records for f in r.fields}
+    all_fields = {f.qname: f for r in schema.records for f in r.fields}
 
     assert list(all_fields) == [
         "person.id",
         "person.name",
+        "person.count",
         "address.person_id",
         "address.type",
         "address.street",
@@ -50,5 +52,11 @@ def assert_schema(file):
     assert all_fields["address.person_id"].primary_key
 
     assert len(all_fields["address.person_id"].foreign_keys) == 1
-    assert all_fields["address.person_id"].foreign_keys[0] == "person.id"
+    assert all_fields["address.person_id"].foreign_keys[0].qname == "person.id"
+
+    assert schema.get_field("person.id").datatype == DT_STRING
+
+    count_type = schema.get_field("person.count").datatype
+    assert count_type.id == "categorical"
+    assert count_type.restriction.enumeration == ["one", "two", "three"]
     

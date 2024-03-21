@@ -3,39 +3,32 @@ from tempfile import TemporaryDirectory
 
 import pytest
 
-from sfdata_schema.spec import Field, Record, TabularSchema
+from sfdata_schema.spec import TabularSchema
 from sfdata_schema.erd import get_erd_context, render_erd
 
 
 @pytest.fixture
 def test_schema():
-    schema = TabularSchema(
-        records=[
-            Record(
-                "person",
-                ["*id", "first_name", "last_name"],
-                extras={"color": "LightPink"},
-            ),
-            Record(
-                "pet", ["*id", Field("owner_id", foreign_keys=["person.id"]), "name"]
-            ),
-            Record(
-                "address",
-                [
-                    Field("owner_id", primary_key=True, foreign_keys=["person.id"]),
-                    "*type",
-                    "address",
-                ],
-            ),
-            Record(
-                "primary_phone",
-                [
-                    Field("owner_id", primary_key=True, foreign_keys=["person.id"]),
-                    "number",
-                ],
-            ),
-        ]
-    )
+    schema = TabularSchema(id="person_schema")
+    person_record = schema.add_record("person", options={"color": "LightPink"})
+    person_record.add_field("id", primary_key=True)
+    person_record.add_field("first_name")
+    person_record.add_field("last_name")
+
+    pet_record = schema.add_record("pet")
+    pet_record.add_field("id", primary_key=True)
+    pet_record.add_field("owner_id", foreign_keys=["person.id"])
+    pet_record.add_field("name")
+
+    address_record = schema.add_record("address")
+    address_record.add_field("owner_id", primary_key=True, foreign_keys=["person.id"])
+    address_record.add_field("type", primary_key=True)
+    address_record.add_field("address")
+
+    primary_phone_record = schema.add_record("primary_phone")
+    primary_phone_record.add_field("id", primary_key=True, foreign_keys=["person.id"])
+    primary_phone_record.add_field("number")
+
     return schema
 
 
@@ -90,3 +83,4 @@ def test_dot(test_schema, dist_dir):
     assert "<title>person</title>" in svg
     assert "<title>pet</title>" in svg
     assert "<title>address</title>" in svg
+    assert '<polygon fill="LightPink"' in svg
