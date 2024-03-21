@@ -1,4 +1,3 @@
-from dataclasses import fields
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Protocol, Union, runtime_checkable
 
@@ -28,6 +27,19 @@ def parse_schema(schema: ParserInput) -> spec.TabularSchema:
         return _parse_file(schema)
 
 
+def _parse_file(path: Path) -> spec.TabularSchema:
+    with path.open("rt") as f:
+        return _parse_string(f.read())
+
+
+def _parse_string(content: str) -> spec.TabularSchema:
+    if content.startswith("{"):
+        content = json5.loads(content)
+    else:
+        content = yaml.safe_load(content)
+    return _parse_dict(content)
+
+
 def _parse_dict(schema: Dict[str, Any]) -> spec.TabularSchema:
     datatypes = parse_datatypes(schema.pop("datatypes", {}))
     records = schema.pop("records", {})
@@ -41,19 +53,6 @@ def _parse_dict(schema: Dict[str, Any]) -> spec.TabularSchema:
         parse_record(schema, record)
 
     return schema
-
-
-def _parse_file(path: Path) -> spec.TabularSchema:
-    with path.open("rt") as f:
-        return _parse_string(f.read())
-
-
-def _parse_string(content: str) -> spec.TabularSchema:
-    if content.startswith("{"):
-        content = json5.loads(content)
-    else:
-        content = yaml.safe_load(content)
-    return _parse_dict(content)
 
 
 def parse_datatype(

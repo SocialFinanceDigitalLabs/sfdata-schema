@@ -1,6 +1,7 @@
 from collections import namedtuple
 from pathlib import Path
-from typing import Any, Mapping, Union
+from tempfile import TemporaryDirectory
+from typing import Any, Mapping, Optional, Union
 
 from sfdata_schema.spec import TabularSchema
 
@@ -27,7 +28,7 @@ def render_erd(
     schema: TabularSchema,
     template_name: str = "erd.dot",
     template_path: Union[str, Path] = None,
-):
+) -> str:
     try:
         from jinja2 import Environment, FileSystemLoader, select_autoescape
     except ImportError:
@@ -43,3 +44,25 @@ def render_erd(
     context = get_erd_context(schema)
     template = env.get_template(template_name)
     return template.render(context)
+
+
+def graphviz_render_erd(
+    schema: TabularSchema, format: str = "png", target_path: Path = None, **kwargs
+) -> Optional[bytes]:
+    import graphviz
+
+    with TemporaryDirectory() as tmpdir:
+        dot_path = Path(tmpdir) / "graph.dot"
+        with dot_path.open("wt") as file:
+            file.write(render_erd(schema, **kwargs))
+
+        output_path = graphviz.render("circo", format, dot_path)
+        output_path = Path(output_path)
+
+        if target_path:
+            output_path.replace(target_path)
+            data = None
+        else:
+            data = output_path.read_bytes()
+
+    return data

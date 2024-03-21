@@ -1,0 +1,63 @@
+---
+layout: default
+---
+{% assign record = page.spec %}
+
+<h1>{{ record.id | upcase }} Record</h1>
+
+<p>
+{{ record.description }}
+</p>
+
+<table>
+<thead>
+  <tr>
+    <th>ID</th>
+    <th>Name</th>
+    <th>Type</th>
+    <th>Dimension</th>
+  <tr>
+</thead>
+<tbody>
+{% for field in record.fields %}
+  <tr>
+    <td><a href="#{{ field.id }}">{{ field.id }} {% if field.primary_key %} <b>[PK]</b>{% endif %}</a></td>
+    <td>{{ field.label }}</td>
+    <td>{{ field.datatype.id }}</td>
+    <td>{% if field.datatype.restriction.enumeration %}
+      <a href="{{ '/dimensions/' | append: field.datatype.id | relative_url  }}">{{ field.datatype.id }}</a>
+    {% endif %}</td>
+  </tr>
+{% endfor %}
+</tbody>
+</table>
+
+
+<h2>Fields</h2>
+
+{% for field in record.fields %}
+<section id="{{field.id}}">
+<h3>{{field.id}}: {{field.label}}</h3>
+<p>{{ field.description }}</p>
+
+<table>
+  <tr><th>Type</th><td>{{ field.type.id }}</td></tr>
+{% if field.primary_key %}
+  <tr><th>Primary Key</th><td>True</td></tr>
+{% endif %}
+
+<tr><th>Data Type</th><td><a href="{{ '/datatypes/' | append: field.datatype.id | relative_url  }}">{{ field.datatype.id }}</a></td></tr>
+
+{% if field.datatype.extends %}
+  <tr><th>Extends</th><td><a href="{{ '/datatypes/' | append: field.datatype.extends.id | relative_url  }}">{{ field.datatype.extends.id }}</a></td></tr>
+{% endif %}
+
+{% if field.datatype.restriction.enumeration %}
+  <tr><th>Dimension</th><td><a href="{{ '/dimensions/' | append: field.datatype.id | relative_url  }}">{{ field.datatype.id }}</a></td></tr>
+{% endif %}
+
+
+</table>
+
+</section>
+{% endfor %}

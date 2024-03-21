@@ -6,7 +6,7 @@ from sfdata_schema.spec.datatypes import DT_STRING
 
 @pytest.fixture
 def simple_schema():
-    schema =  TabularSchema(id="s1")
+    schema = TabularSchema(id="s1")
     r1 = schema.add_record("r1", label="r1")
     r2 = schema.add_record("r2", label="r2")
 
@@ -48,13 +48,11 @@ def test_spec_repr():
     r1 = Record("r1", "r1", [])
     assert repr(r1) == "Record(id='r1', options='{}')"
 
+
 def test_spec_hash():
     r1 = Record("r1", "r1", [])
     r1_alt = Record("r1", "r1", [])
 
-    my_lookup = {
-        r1: r1,
-        r1_alt: r1_alt
-    }
+    my_lookup = {r1: r1, r1_alt: r1_alt}
 
     assert len(my_lookup) == 1

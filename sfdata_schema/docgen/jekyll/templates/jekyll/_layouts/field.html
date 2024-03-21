@@ -1,0 +1,23 @@
+---
+layout: default
+---
+{% assign dimension = site.data.dimensions | where: "id", page.dimension_id | first %}
+
+<h1>{{ dimension.id | upcase }} Dimension</h1>
+
+<table>
+<thead>
+  <tr>
+    <th>Value</th>
+    <th>Description</th>
+  <tr>
+</thead>
+<tbody>
+{% for d in dimension.dimensions %}
+  <tr>
+    <td>{{ d.value }}</td>
+    <td>{{ d.description }}</td>
+  </tr>
+{% endfor %}
+</tbody>
+</table>

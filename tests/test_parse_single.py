@@ -1,7 +1,9 @@
 from pathlib import Path
+
+from sfdata_schema.parser import Readable, parse_schema
 from sfdata_schema.spec import TabularSchema
-from sfdata_schema.parser import parse_schema, Readable
 from sfdata_schema.spec.datatypes import DT_STRING
+
 
 def test_readable():
     from io import StringIO
@@ -59,4 +61,3 @@ def assert_schema(file):
     count_type = schema.get_field("person.count").datatype
     assert count_type.id == "categorical"
     assert count_type.restriction.enumeration == ["one", "two", "three"]
-    

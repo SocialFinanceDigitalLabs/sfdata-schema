@@ -1,40 +1,9 @@
-from pathlib import Path
-from tempfile import TemporaryDirectory
-
-import pytest
-
-from sfdata_schema.spec import TabularSchema
-from sfdata_schema.erd import get_erd_context, render_erd
+from sfdata_schema.docgen.erd import get_erd_context, graphviz_render_erd, render_erd
 
 
-@pytest.fixture
-def test_schema():
-    schema = TabularSchema(id="person_schema")
-    person_record = schema.add_record("person", options={"color": "LightPink"})
-    person_record.add_field("id", primary_key=True)
-    person_record.add_field("first_name")
-    person_record.add_field("last_name")
-
-    pet_record = schema.add_record("pet")
-    pet_record.add_field("id", primary_key=True)
-    pet_record.add_field("owner_id", foreign_keys=["person.id"])
-    pet_record.add_field("name")
-
-    address_record = schema.add_record("address")
-    address_record.add_field("owner_id", primary_key=True, foreign_keys=["person.id"])
-    address_record.add_field("type", primary_key=True)
-    address_record.add_field("address")
-
-    primary_phone_record = schema.add_record("primary_phone")
-    primary_phone_record.add_field("id", primary_key=True, foreign_keys=["person.id"])
-    primary_phone_record.add_field("number")
-
-    return schema
-
-
-def test_get_erd_context(test_schema):
-    context = get_erd_context(test_schema)
-    assert context["schema"] == test_schema
+def test_get_erd_context(pet_schema):
+    context = get_erd_context(pet_schema)
+    assert context["schema"] == pet_schema
 
     relationships = context["relationships"]
     assert len(relationships) == 3
@@ -54,31 +23,23 @@ def test_get_erd_context(test_schema):
     assert rel_map["primary_phone"].lh_c == "0,1"
 
 
-def test_render_erd(test_schema):
-    erd = render_erd(test_schema)
+def test_render_erd(pet_schema):
+    erd = render_erd(pet_schema)
     assert '<TD COLSPAN="3"><B><FONT POINT-SIZE="16">person</FONT></B></TD>' in erd
     assert '<TD ALIGN="LEFT">first_name</TD>'
 
 
-def create_image(source_image, format, target_path):
-    import graphviz
-    output_path = graphviz.render("circo", format, source_image)
-    output_path = Path(output_path)
-    output_path.replace(target_path)
-    return target_path
+def test_dot_save(pet_schema, dist_dir):
+    png_path = dist_dir / "test_dot.png"
+    svg_path = dist_dir / "test_dot.svg"
+
+    graphviz_render_erd(pet_schema, "png", png_path)
+    graphviz_render_erd(pet_schema, "svg", svg_path)
 
 
-def test_dot(test_schema, dist_dir):
-    with TemporaryDirectory() as tmpdir:
-        dot_path = Path(tmpdir) / "test.dot"
-        with dot_path.open("wt") as file:
-            file.write(render_erd(test_schema))
-
-        create_image(dot_path, "png", dist_dir / "test_dot.png")
-        svg_path = create_image(dot_path, "svg", dist_dir / "test_dot.svg")
-
-    with svg_path.open("rt") as file:
-        svg = file.read()
+def test_dot_svg(pet_schema):
+    svg_bytes = graphviz_render_erd(pet_schema, "svg")
+    svg = svg_bytes.decode("utf-8")
 
     assert "<title>person</title>" in svg
     assert "<title>pet</title>" in svg

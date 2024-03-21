@@ -306,6 +306,20 @@ class TabularSchema(Schema):
     def datatypes(self) -> Tuple[Datatype]:
         return self._datatypes
 
+    @property
+    def version(self) -> str:
+        return self._version
+
+    @property
+    def all_fields(self) -> Tuple[Field]:
+        return tuple(field for record in self.records for field in record.fields)
+
+    @property
+    def used_datatypes(self) -> Tuple[Datatype]:
+        used_types = set(field.datatype for field in self.all_fields)
+        # We want to preserve the order of the standard types
+        return tuple(t for t in self.datatypes if t in used_types)
+
     def get_record(self, id: str) -> Record:
         for record in self.records:
             if record.id == id:

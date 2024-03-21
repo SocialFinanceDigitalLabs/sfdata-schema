@@ -1,0 +1,18 @@
+---
+layout: default
+---
+
+<h2>Records</h2>
+
+<p>The following records are defined:</p>
+
+<ul>
+{% for r in site.data.records %}
+  <li><a href="{{ '/records/' | append: r.id | relative_url  }}">{{ r.id }}</a></li>
+{% endfor %}
+</ul>
+
+{% if site.erd_include %}
+{% include erd.svg %}
+{% endif %}
+
