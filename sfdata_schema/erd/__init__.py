@@ -2,7 +2,6 @@ from collections import namedtuple
 from pathlib import Path
 from typing import Any, Mapping, Union
 
-
 from sfdata_schema.spec import TabularSchema
 
 Relationship = namedtuple("Relationship", "lh rh lh_c rh_c")

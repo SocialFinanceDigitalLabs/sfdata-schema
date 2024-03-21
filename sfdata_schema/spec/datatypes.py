@@ -48,7 +48,8 @@ class DatatypeRestriction:
 @dataclass(frozen=True, eq=True, repr=True)
 class Datatype:
     """A datatype is a type of data that can be stored in a field. Implementations can chose to extend
-    the standard datatypes with custom ones. The standard datatypes however are based on the XML Schema Part"""
+    the standard datatypes with custom ones. The standard datatypes however are based on the XML Schema Part
+    """
 
     id: str
     description: Optional[str] = field(default=None, compare=False)

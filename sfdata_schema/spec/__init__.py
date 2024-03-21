@@ -1,5 +1,7 @@
 from typing import Any, Iterable, List, Mapping, Optional, Tuple
-from .datatypes import DT_STRING, Datatype, STANDARD_TYPES
+
+from .datatypes import DT_STRING, STANDARD_TYPES, Datatype
+
 
 class __FieldSummary__:
     """A helper class to generate a string representation of the fields of an object. This is used to generate the
@@ -49,33 +51,32 @@ class SchemaItem:
     @property
     def description(self) -> Optional[str]:
         return self._description
-    
+
     @property
     def options(self) -> Mapping[str, Any]:
         return self._options
-    
+
     @property
     def schema(self) -> "Schema":
         return self._schema
-    
+
     def __eq__(self, other):
         if not isinstance(other, SchemaItem):
             return False
         return self.id == other.id
-    
+
     def __hash__(self):
         return hash(self.id)
-    
+
     def __repr_fields__(self):
         fields = __FieldSummary__(include_none=False)
         fields.add_field(self, "id")
         fields.add_field(self, "description")
         fields.add_field(self, "options")
         return fields
-    
+
     def __repr__(self):
         return f"{self.__class__.__name__}({self.__repr_fields__().as_string()})"
-    
 
 
 class CategoricalValueItem(SchemaItem):
@@ -142,35 +143,35 @@ class Field(SchemaItem):
     @property
     def record(self) -> "Record":
         return self._record
-    
+
     @property
     def schema(self) -> "Schema":
         return self.record.schema
-    
+
     @property
     def qname(self) -> str:
         return f"{self.record.id}.{self.id}"
-    
+
     @property
     def label(self) -> str:
         return self._label
-    
+
     @property
     def datatype(self) -> "Datatype":
         return self._datatype
-    
+
     @property
     def primary_key(self) -> bool:
         return self._primary_key
-    
+
     @property
     def foreign_keys(self) -> Tuple["Field"]:
         return tuple(self.schema.get_field(fk) for fk in self._foreign_keys)
-    
+
     @property
     def foreign_key_names(self) -> Tuple[str]:
         return tuple(self._foreign_keys)
-    
+
 
 class Record(SchemaItem):
     """
@@ -195,7 +196,7 @@ class Record(SchemaItem):
     @property
     def schema(self) -> "Schema":
         return self._schema
-    
+
     @property
     def label(self) -> str:
         return self._label
@@ -225,15 +226,15 @@ class Record(SchemaItem):
         )
         self._fields.append(field)
         return field
-    
+
     @property
     def fields(self) -> Tuple[Field]:
         return tuple(self._fields)
-    
+
     @property
     def primary_keys(self) -> Tuple[Field]:
         return tuple(f for f in self.fields if f.primary_key)
-    
+
     def get_field(self, id: str) -> Field:
         for field in self.fields:
             if field.id == id:
@@ -300,11 +301,11 @@ class TabularSchema(Schema):
     @property
     def records(self) -> Tuple[Record]:
         return tuple(self._records)
-    
+
     @property
     def datatypes(self) -> Tuple[Datatype]:
         return self._datatypes
-    
+
     def get_record(self, id: str) -> Record:
         for record in self.records:
             if record.id == id:
@@ -313,7 +314,9 @@ class TabularSchema(Schema):
 
     def get_field(self, id: str) -> Field:
         if id.count(".") != 1:
-            raise ValueError(f"Invalid field id '{id}'. Must be of format <record_id>.<field_id>")
+            raise ValueError(
+                f"Invalid field id '{id}'. Must be of format <record_id>.<field_id>"
+            )
         record_id, field_id = id.split(".", 1)
         return self.get_record(record_id).get_field(field_id)
 

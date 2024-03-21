@@ -1,6 +1,6 @@
+from dataclasses import fields
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Protocol, Union, runtime_checkable
-from dataclasses import fields
 
 import json5
 import yaml
@@ -11,11 +11,11 @@ from sfdata_schema.spec.datatypes import STANDARD_TYPES, Datatype, DatatypeRestr
 
 @runtime_checkable
 class Readable(Protocol):
-    def read(self) -> str:
-        ...
+    def read(self) -> str: ...
 
 
 ParserInput = Union[Dict[str, Any], Readable, str, Path]
+
 
 def parse_schema(schema: ParserInput) -> spec.TabularSchema:
     if isinstance(schema, dict):
@@ -87,9 +87,7 @@ def parse_datatypes(datatypes: Dict[str, Dict[str, str]]) -> List[spec.Datatype]
     return datatype_list
 
 
-def parse_record(
-    schema: spec.TabularSchema, record: Dict[str, Any]
-) -> spec.Record:
+def parse_record(schema: spec.TabularSchema, record: Dict[str, Any]) -> spec.Record:
     fields = record.pop("fields") or {}
 
     schema_record = schema.add_record(**record)
@@ -97,8 +95,5 @@ def parse_record(
         if "id" not in field:
             field["id"] = id
         schema_record.add_field(**field)
-            
+
     return schema_record
-
-
-
